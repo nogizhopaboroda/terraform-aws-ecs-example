@@ -1,15 +1,14 @@
 # terraform-aws-ecs-example
 example of forming infrastructure on aws ecs using terraform
 
-
-# steps
-
-- init
+# init terraform
 
 ```sh
 cd terraform
 terraform init
 ```
+
+# steps
 
 - provision aws
 

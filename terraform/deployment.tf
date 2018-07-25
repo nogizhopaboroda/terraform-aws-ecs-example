@@ -1,15 +1,17 @@
 /* define task */
 
-data "aws_ecs_task_definition" "app_td" {
-  task_definition = "${aws_ecs_task_definition.app_td.family}"
-}
-
 variable "is_deployment" {
   default = false
 }
 
 variable "image_tag" {
   default = "latest"
+}
+
+
+data "aws_ecs_task_definition" "app_td" {
+  count = "${var.is_deployment == true ? 1 : 0}"
+  task_definition = "${aws_ecs_task_definition.app_td.family}"
 }
 
 resource "aws_ecs_task_definition" "app_td" {

@@ -9,13 +9,7 @@ variable "image_tag" {
 }
 
 
-data "aws_ecs_task_definition" "app_td" {
-  count = "${var.is_deployment == true ? 1 : 0}"
-  task_definition = "${aws_ecs_task_definition.app_td.family}"
-}
-
 resource "aws_ecs_task_definition" "app_td" {
-  count = "${var.is_deployment == true ? 1 : 0}"
   family                = "${var.app_name}-td"
   container_definitions = <<DEFINITION
 [
@@ -37,6 +31,10 @@ resource "aws_ecs_task_definition" "app_td" {
   }
 ]
 DEFINITION
+}
+
+data "aws_ecs_task_definition" "app_td" {
+  task_definition = "${aws_ecs_task_definition.app_td.family}"
 }
 
 

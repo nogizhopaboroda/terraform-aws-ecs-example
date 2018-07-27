@@ -23,3 +23,12 @@ output "repository_url" {
 output "workspace" {
   value = "${terraform.workspace}"
 }
+
+output "instance_dns" {
+  value = "${data.aws_instance.app_instance.public_dns}"
+}
+
+output "instance_ssh_key_pem" {
+  sensitive = true
+  value = "${tls_private_key.app_key.public_key_pem}"
+}

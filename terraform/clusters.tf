@@ -1,11 +1,17 @@
-resource "aws_ecr_repository" "app_containers_repo" {
-  name = "${var.app_name}-repository"
-}
-
 /* create cluster itself */
 
 resource "aws_ecs_cluster" "app_cluster" {
   name = "${var.app_name}-cluster"
+}
+
+resource "tls_private_key" "app_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "generated_key" {
+  key_name   = "app-keypair"
+  public_key = "${tls_private_key.app_key.public_key_openssh}"
 }
 
 /* define what kind of instance to launch */
@@ -15,7 +21,7 @@ resource "aws_launch_configuration" "app_lc" {
     image_id                    = "ami-6b81980b"
     instance_type               = "t2.micro"
     iam_instance_profile        = "${aws_iam_instance_profile.app_ecs_instance_profile.id}"
-    key_name                    = "test-keypair"
+    key_name                    = "${aws_key_pair.generated_key.key_name}"
     security_groups             = ["${aws_security_group.app_cluster_sg.id}"]
     associate_public_ip_address = true
     user_data                   = <<EOF
@@ -53,5 +59,11 @@ resource "aws_autoscaling_group" "app_cluster_asg" {
         propagate_at_launch = true
     }
 
+}
+
+data "aws_instance" "app_instance" {
+  instance_tags = {
+    "Name" = "${var.app_name} ECS Instance"
+  }
 }
 

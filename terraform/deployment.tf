@@ -1,3 +1,10 @@
+/* create repository for containers */
+
+resource "aws_ecr_repository" "app_containers_repo" {
+  name = "${var.app_name}-repository"
+}
+
+
 /* define task */
 
 variable "is_deployment" {

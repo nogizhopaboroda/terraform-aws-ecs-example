@@ -11,12 +11,14 @@ resource "aws_vpc" "app_main_vpc" {
     }
 }
 
+data "aws_availability_zones" "available" {}
+
 /* create subnets in thids VPC */
 
 resource "aws_subnet" "app_subnet_1a" {
     vpc_id                  = "${aws_vpc.app_main_vpc.id}"
     cidr_block              = "172.31.16.0/20"
-    availability_zone       = "us-west-1a"
+    availability_zone       = "${data.aws_availability_zones.available.names[0]}"
     map_public_ip_on_launch = true
 
     tags {
@@ -26,7 +28,7 @@ resource "aws_subnet" "app_subnet_1a" {
 resource "aws_subnet" "app_subnet_1c" {
     vpc_id                  = "${aws_vpc.app_main_vpc.id}"
     cidr_block              = "172.31.0.0/20"
-    availability_zone       = "us-west-1c"
+    availability_zone       = "${data.aws_availability_zones.available.names[1]}"
     map_public_ip_on_launch = true
 
     tags {

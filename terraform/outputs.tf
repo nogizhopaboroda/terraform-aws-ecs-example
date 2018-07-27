@@ -30,5 +30,5 @@ output "instance_dns" {
 
 output "instance_ssh_key_pem" {
   sensitive = true
-  value = "${tls_private_key.app_key.public_key_pem}"
+  value = "${tls_private_key.app_key.private_key_pem}"
 }

@@ -10,8 +10,6 @@ terraform init
 
 # steps
 
-- create keypair called `test-keypair` (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html#having-ec2-create-your-key-pair)
-
 - provision aws
 
 ```sh

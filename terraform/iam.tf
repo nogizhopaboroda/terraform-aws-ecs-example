@@ -46,7 +46,7 @@ resource "aws_iam_role_policy_attachment" "app_ecs_instance_role_attachment" {
 resource "aws_iam_instance_profile" "app_ecs_instance_profile" {
     name = "${var.app_name}-ecs-instance-profile"
     path = "/"
-    roles = ["${aws_iam_role.app_ecs_instance_role.id}"]
+    role = "${aws_iam_role.app_ecs_instance_role.id}"
     provisioner "local-exec" {
       command = "sleep 10"
     }

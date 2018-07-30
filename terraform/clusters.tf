@@ -51,7 +51,7 @@ resource "aws_autoscaling_group" "app_cluster_asg" {
     launch_configuration      = "${aws_launch_configuration.app_lc.name}"
     max_size                  = 1
     min_size                  = 0
-    vpc_zone_identifier       = ["${aws_subnet.app_subnet_1a.id}", "${aws_subnet.app_subnet_1c.id}"]
+    vpc_zone_identifier       = ["${aws_subnet.app_subnet.*.id}"]
 
     tag {
         key   = "Name"
@@ -62,6 +62,7 @@ resource "aws_autoscaling_group" "app_cluster_asg" {
 }
 
 data "aws_instance" "app_instance" {
+  depends_on = ["aws_autoscaling_group.app_cluster_asg"]
   instance_tags = {
     "Name" = "${var.app_name} ECS Instance"
   }

@@ -13,25 +13,20 @@ resource "aws_vpc" "app_main_vpc" {
 
 data "aws_availability_zones" "available" {}
 
-/* create subnets in thids VPC */
-
-resource "aws_subnet" "app_subnet_1a" {
-    vpc_id                  = "${aws_vpc.app_main_vpc.id}"
-    cidr_block              = "172.31.16.0/20"
-    availability_zone       = "${data.aws_availability_zones.available.names[0]}"
-    map_public_ip_on_launch = true
-
-    tags {
-    }
+locals {
+  network_count = "${length(data.aws_availability_zones.available.names)}"
 }
 
-resource "aws_subnet" "app_subnet_1c" {
+/* create subnets in thids VPC */
+resource "aws_subnet" "app_subnet" {
+    count = "${local.network_count}"
     vpc_id                  = "${aws_vpc.app_main_vpc.id}"
-    cidr_block              = "172.31.0.0/20"
-    availability_zone       = "${data.aws_availability_zones.available.names[1]}"
+    cidr_block              = "${cidrsubnet(aws_vpc.app_main_vpc.cidr_block, 8, count.index)}"
+    availability_zone       = "${data.aws_availability_zones.available.names[count.index]}"
     map_public_ip_on_launch = true
 
     tags {
+      Name = "${var.app_name} subnet in zone: ${data.aws_availability_zones.available.names[count.index]}"
     }
 }
 
@@ -107,7 +102,7 @@ resource "aws_alb" "app_load_balancer" {
     idle_timeout    = 60
     internal        = false
     security_groups = ["${aws_security_group.app_load_balancer_sg.id}"]
-    subnets         = ["${aws_subnet.app_subnet_1a.id}", "${aws_subnet.app_subnet_1c.id}"]
+    subnets         = ["${aws_subnet.app_subnet.*.id}"]
 
     enable_deletion_protection = false
 
@@ -154,17 +149,9 @@ resource "aws_route_table" "app_route_table" {
     }
 }
 
-resource "aws_route_table_association" "a" {
-  subnet_id      = "${aws_subnet.app_subnet_1a.id}"
+resource "aws_route_table_association" "app_rta" {
+  count = "${local.network_count}"
+  subnet_id      = "${aws_subnet.app_subnet.*.id[count.index]}"
   route_table_id = "${aws_route_table.app_route_table.id}"
 }
-
-resource "aws_route_table_association" "c" {
-  subnet_id      = "${aws_subnet.app_subnet_1c.id}"
-  route_table_id = "${aws_route_table.app_route_table.id}"
-}
-
-
-
-
 
